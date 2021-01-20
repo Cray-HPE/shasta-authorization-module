@@ -7,5 +7,7 @@ rpmBuild(
     slack_notify: ['BEGIN', 'FAILURE', 'SUCCESS'],
     product: "csm",
     fanout_params: ["sle15sp1"],
-    target_node: "ncn"
+    target_node: "ncn",
+    githubPushRepo: "Cray-HPE/shasta-authorization-module",
+    githubPushBranches: /(bugfix\/.*|feature\/.*|hotfix\/.*|master|release\/.*)/
 )
