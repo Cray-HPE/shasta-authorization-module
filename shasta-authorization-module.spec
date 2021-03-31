@@ -1,6 +1,6 @@
-# Copyright 2019 Cray Inc. All Rights Reserved.
+# Copyright 2019,2021 Hewlett Packard Enterprise Development LP
 Name: shasta-authorization-module
-License: Cray Software License Agreement
+License: MIT
 Summary: An Ansible Module that authenticates requests into the management plane
 Group: System/Management
 Version: %(cat .rpm_version)
