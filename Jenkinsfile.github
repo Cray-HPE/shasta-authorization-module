@@ -1,0 +1,85 @@
+@Library('csm-shared-library') _
+
+pipeline {
+    agent {
+        label "metal-gcp-builder"
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: "10"))
+        timestamps()
+    }
+
+    environment {
+        NAME = "shasta-authorization-module"
+        DESCRIPTION = "An Ansible Module that authenticates requests into the management plane"
+        SPEC_FILE = "shasta-authorization-module.spec"
+        IS_STABLE = getBuildIsStable()
+        VERSION = sh(returnStdout: true, script: "head -1 .version").trim()
+        BUILD_METADATA = getRpmRevision(isStable: env.IS_STABLE)
+    }
+
+    stages {
+        stage("Clone cms_meta_tools repo") {
+            steps {
+                withCredentials([gitUsernamePassword(credentialsId: 'jenkins-algol60-cray-hpe-github-integration')]) {
+                    sh 'git clone --depth 1 --no-single-branch https://github.com/Cray-HPE/cms-meta-tools.git ./cms_meta_tools'
+                }
+            }
+        }
+
+        stage("runBuildPrep") {
+            steps {
+                sh "make runbuildprep"
+            }
+        }
+
+        stage("Lint") {
+            steps {
+                sh "make lint"
+            }
+        }
+
+        stage("Add RPM Metadata") {
+            steps {
+                echo "RPM build metadata is ${env.BUILD_METADATA}"
+                runLibraryScript("addRpmMetaData.sh", "")
+            }
+        }
+
+        stage("Prepare") {
+            steps {
+                sh "make prepare"
+            }
+        }
+
+        stage("Package RPM Source") {
+            steps {
+                sh "make rpm_package_source"
+            }
+        }
+
+        stage("Build") {
+            parallel {
+                stage("Build RPM") {
+                    steps {
+                        sh "make rpm_build"
+                    }
+                }
+                
+                stage("Build Source RPM") {
+                    steps {
+                        sh "make rpm_build_source"                    
+                    }
+                }
+            }
+        }
+
+        stage('Publish ') {
+            steps {
+                publishCsmRpms(component: env.NAME, pattern: "dist/rpmbuild/RPMS/noarch/*.rpm", arch: "noarch", isStable: env.IS_STABLE)
+                publishCsmRpms(component: env.NAME, pattern: "dist/rpmbuild/SRPMS/*.rpm", arch: "src", isStable: env.IS_STABLE)
+            }
+        }
+    }
+}
