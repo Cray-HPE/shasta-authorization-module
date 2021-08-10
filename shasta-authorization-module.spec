@@ -25,8 +25,9 @@ Summary: An Ansible Module that authenticates requests into the management plane
 Group: System/Management
 Version: %(cat .version)
 Release: %(echo ${BUILD_METADATA})
+BuildArch: noarch
 Source: %{name}-%{version}.tar.bz2
-Vendor: Cray Inc.
+Vendor: Hewlett Packard Enterprise Development LP
 Requires: cray-crayctl
 Requires: cray-python-helper-requires-crayctldeploy
 
