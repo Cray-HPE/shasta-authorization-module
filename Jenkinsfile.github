@@ -59,25 +59,9 @@ pipeline {
             }
         }
 
-        stage("Package RPM Source") {
-            steps {
-                sh "make rpm_package_source"
-            }
-        }
-
         stage("Build") {
-            parallel {
-                stage("Build RPM") {
-                    steps {
-                        sh "make rpm_build"
-                    }
-                }
-                
-                stage("Build Source RPM") {
-                    steps {
-                        sh "make rpm_build_source"                    
-                    }
-                }
+            steps {
+                sh "make rpm"
             }
         }
 
