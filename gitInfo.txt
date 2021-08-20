@@ -1,0 +1,1 @@
+No git info generated at build time

@@ -55,6 +55,7 @@ rpm_package_source:
 				LICENSE \
 				Makefile \
 				${SPEC_FILE} \
+				gitInfo.txt \
 				README.md
 
 rpm_build_source:
